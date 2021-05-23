@@ -1,8 +1,11 @@
 import dotenv from 'dotenv';
+import express from 'express';
+import { ApolloServer } from 'apollo-server-express';
+import { buildSchema } from 'type-graphql';
 import { MikroORM } from '@mikro-orm/core';
 import { ___prod___ } from './constants';
-import { Post } from './entities/Post';
 import mikroOrmConfig from './mikro-orm.config';
+import { HelloResolver } from './resolvers/hello';
 
 dotenv.config();
 
@@ -10,12 +13,22 @@ const main = async () => {
   const orm = await MikroORM.init(mikroOrmConfig);
   await orm.getMigrator().up();
 
-  // const post = orm.em.create(Post, { title: 'my fist post' });
-  // await orm.em.persistAndFlush(post);
+  const app = express();
+  const apolloServer = new ApolloServer({
+    schema: await buildSchema({
+      resolvers: [HelloResolver],
+      validate: false,
+    }),
+  });
 
-  const posts = await orm.em.find(Post, {});
+  apolloServer.applyMiddleware({ app });
 
-  console.log(posts);
+  const port = process.env.PORT || 4242;
+  app.listen(port, () => {
+    console.log(
+      `🚀 Lireddit Server has started. http:localhost:${port}/graphql`
+    );
+  });
 };
 
 main().catch((e) => {
