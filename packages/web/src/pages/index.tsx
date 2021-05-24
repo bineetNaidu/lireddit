@@ -1,9 +1,10 @@
-import { Container } from '../components/Container';
+import Navbar from '../components/Navbar';
 
 const Index = () => (
-  <Container height="100vh">
+  <div>
+    <Navbar />
     <h1>Hello Lireddit</h1>
-  </Container>
+  </div>
 );
 
 export default Index;
