@@ -1,16 +1,13 @@
 import { FC } from 'react';
 import { Formik, Form } from 'formik';
-import { Box } from '@chakra-ui/layout';
+import { Box, Button } from '@chakra-ui/react';
 import { Wrapper } from '../components/Wrapper';
 import { InputField } from '../components/InputField';
-import { Button } from '@chakra-ui/button';
 import { useLoginMutation } from '../generated/graphql';
 import { toErrorMap } from '../utils/toErrorMap';
 import { useRouter } from 'next/router';
 
-interface Props {}
-
-const login: FC<Props> = ({}) => {
+const Login: FC<{}> = ({}) => {
   const [, login] = useLoginMutation();
   const router = useRouter();
 
@@ -20,10 +17,11 @@ const login: FC<Props> = ({}) => {
         initialValues={{ username: '', password: '' }}
         onSubmit={async (values, { setErrors }) => {
           const res = await login({ options: values });
-
-          if (res.data?.login?.errors) {
+          if (res.data?.login!.errors) {
             setErrors(toErrorMap(res.data.login.errors));
-          } else if (res.data?.login?.user) {
+          }
+          if (res.data?.login!.user?.id) {
+            // worked
             router.push('/');
           }
         }}
@@ -47,9 +45,9 @@ const login: FC<Props> = ({}) => {
               mt={4}
               type="submit"
               isLoading={isSubmitting}
-              variantcolor="teal"
+              variantColor="teal"
             >
-              Login
+              login
             </Button>
           </Form>
         )}
@@ -58,4 +56,4 @@ const login: FC<Props> = ({}) => {
   );
 };
 
-export default login;
+export default Login;
