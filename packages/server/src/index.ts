@@ -7,6 +7,7 @@ import { MikroORM } from '@mikro-orm/core';
 import redis from 'redis';
 import session from 'express-session';
 import connectReddis from 'connect-redis';
+import cors from 'cors';
 import { ___prod___ } from './constants';
 import mikroOrmConfig from './mikro-orm.config';
 import { HelloResolver } from './resolvers/hello';
@@ -24,6 +25,13 @@ const main = async () => {
 
   const RedisStore = connectReddis(session);
   const redisClient = redis.createClient();
+
+  app.use(
+    cors({
+      origin: 'http://localhost:3000',
+      credentials: true,
+    })
+  );
 
   app.use(
     session({
@@ -53,7 +61,10 @@ const main = async () => {
     context: ({ req, res }): MyContext => ({ em: orm.em, req, res }),
   });
 
-  apolloServer.applyMiddleware({ app });
+  apolloServer.applyMiddleware({
+    app,
+    cors: false,
+  });
 
   const port = process.env.PORT || 4242;
   app.listen(port, () => {
