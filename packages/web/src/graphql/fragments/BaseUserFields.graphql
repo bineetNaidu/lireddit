@@ -1,0 +1,4 @@
+fragment BaseUserFields on User {
+  id
+  username
+}
