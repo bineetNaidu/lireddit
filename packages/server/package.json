@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node dist/index",
     "dev": "nodemon dist/index",
-    "watch": "tsc -w"
+    "watch": "tsc -w",
+    "create:migration": "mikro-orm migration:create"
   },
   "keywords": [],
   "author": "BineetNaidu <bineet.s.naidu@gmail.com> (https://bineetnaidu-io.web.app/)",
@@ -24,6 +25,7 @@
     "@mikro-orm/migrations": "^4.5.5",
     "@mikro-orm/postgresql": "^4.5.5",
     "apollo-server-express": "^2.24.1",
+    "argon2": "^0.27.2",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "graphql": "^15.5.0",
