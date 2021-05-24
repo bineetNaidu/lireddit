@@ -3,6 +3,7 @@ import { MikroORM } from '@mikro-orm/core';
 import { ___prod___ } from './constants';
 import { Post } from './entities/Post';
 import dotenv from 'dotenv';
+import { User } from './entities/User';
 
 dotenv.config();
 
@@ -17,7 +18,7 @@ export default {
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   debug: !___prod___,
-  entities: [Post],
+  entities: [Post, User],
   host: 'localhost',
   port: 5432,
 } as Parameters<typeof MikroORM.init>[0];
