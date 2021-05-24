@@ -5,6 +5,7 @@ import theme from '../theme';
 import { AppProps } from 'next/app';
 import {
   LoginMutation,
+  LogoutMutation,
   MeDocument,
   MeQuery,
   RegisterMutation,
@@ -30,6 +31,14 @@ function MyApp({ Component, pageProps }: AppProps) {
       cacheExchange({
         updates: {
           Mutation: {
+            logout: (_result, _args, cache, _info) => {
+              betterUpdateQuery<LogoutMutation, MeQuery>(
+                cache,
+                { query: MeDocument },
+                _result,
+                () => ({ me: null })
+              );
+            },
             login: (_result, _args, cache, _info) => {
               betterUpdateQuery<LoginMutation, MeQuery>(
                 cache,
