@@ -1,6 +1,7 @@
+import NextLink from 'next/link';
 import { FC } from 'react';
 import { Formik, Form } from 'formik';
-import { Box, Button } from '@chakra-ui/react';
+import { Box, Button, Flex, Link } from '@chakra-ui/react';
 import { Wrapper } from '../components/Wrapper';
 import { InputField } from '../components/InputField';
 import { useLoginMutation } from '../generated/graphql';
@@ -32,8 +33,8 @@ const Login: FC<{}> = ({}) => {
           <Form>
             <InputField
               name="usernameOrEmail"
-              placeholder="username Or Email"
-              label="UsernameOrEmail"
+              placeholder="Username Or Email"
+              label="Username Or Email"
             />
             <Box mt={4}>
               <InputField
@@ -43,14 +44,21 @@ const Login: FC<{}> = ({}) => {
                 type="password"
               />
             </Box>
-            <Button
-              mt={4}
-              type="submit"
-              isLoading={isSubmitting}
-              variantColor="teal"
-            >
-              login
-            </Button>
+            <Flex>
+              <Button
+                mt={4}
+                type="submit"
+                isLoading={isSubmitting}
+                variantColor="teal"
+              >
+                login
+              </Button>
+              <NextLink href="/forgot-password">
+                <Link ml="auto" mt={5}>
+                  Forgot Password?
+                </Link>
+              </NextLink>
+            </Flex>
           </Form>
         )}
       </Formik>
