@@ -1,0 +1,8 @@
+fragment BaseUserResponse on UserResponse {
+  errors {
+    ...BaseErrors
+  }
+  user {
+    ...BaseUserFields
+  }
+}
