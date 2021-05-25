@@ -1,4 +1,4 @@
-import { dedupExchange, fetchExchange } from 'urql';
+import { dedupExchange, fetchExchange } from '@urql/core';
 import { cacheExchange } from '@urql/exchange-graphcache';
 import {
   LogoutMutation,
