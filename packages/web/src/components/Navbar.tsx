@@ -32,7 +32,7 @@ const Navbar = () => {
     // ? User is Logged IN!
   } else {
     body = (
-      <Flex>
+      <Flex position="sticky" zIndex={1} top={0}>
         <Box mr={2}>@{data.me.username}</Box>
         <Button
           onClick={() => logout()}
