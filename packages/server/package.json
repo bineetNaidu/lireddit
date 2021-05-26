@@ -6,8 +6,7 @@
   "scripts": {
     "start": "node dist/index",
     "dev": "nodemon dist/index",
-    "watch": "tsc -w",
-    "create:migration": "mikro-orm migration:create"
+    "watch": "tsc -w"  
   },
   "keywords": [],
   "author": "BineetNaidu <bineet.s.naidu@gmail.com> (https://bineetnaidu-io.web.app/)",
@@ -27,10 +26,6 @@
     "typescript": "^4.2.4"
   },
   "dependencies": {
-    "@mikro-orm/cli": "^4.5.5",
-    "@mikro-orm/core": "^4.5.5",
-    "@mikro-orm/migrations": "^4.5.5",
-    "@mikro-orm/postgresql": "^4.5.5",
     "apollo-server-express": "^2.24.1",
     "argon2": "^0.27.2",
     "connect-redis": "^5.2.0",
@@ -44,13 +39,7 @@
     "pg": "^8.6.0",
     "reflect-metadata": "^0.1.13",
     "type-graphql": "^1.1.1",
+    "typeorm": "^0.2.32",
     "uuid": "^8.3.2"
-  },
-  "mikro-orm": {
-    "useTsNode": true,
-    "configPaths": [
-      "./src/mikro-orm.config.ts",
-      "./dist/mikro-orm.config.js"
-    ]
   }
 }

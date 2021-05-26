@@ -37,7 +37,7 @@ class UserResponse {
 export class UserResolver {
   @Mutation(() => UserResponse)
   async changePassword(
-    @Ctx() { em, redis, req }: MyContext,
+    @Ctx() { redis, req }: MyContext,
     @Arg('token') token: string,
     @Arg('newPassword') newPassword: string
   ): Promise<UserResponse> {
@@ -65,7 +65,7 @@ export class UserResolver {
       };
     }
 
-    const user = await em.findOne(User, { id: parseInt(uid) });
+    const user = await User.findOne(parseInt(uid));
     if (!user) {
       return {
         errors: [
@@ -78,8 +78,7 @@ export class UserResolver {
     }
 
     const hashedPassword = await argon2.hash(newPassword);
-    user.password = hashedPassword;
-    await em.persistAndFlush(user);
+    await User.update({ id: user.id }, { password: hashedPassword });
 
     //? delete the key value pair from redis
     await redis.del(key);
@@ -92,9 +91,9 @@ export class UserResolver {
   @Mutation(() => Boolean)
   async forgotPassword(
     @Arg('email') email: string,
-    @Ctx() { em, redis }: MyContext
+    @Ctx() { redis }: MyContext
   ): Promise<Boolean> {
-    const user = await em.findOne(User, { email });
+    const user = await User.findOne({ email });
 
     if (!user) {
       // the email is not in the db
@@ -114,31 +113,29 @@ export class UserResolver {
   }
 
   @Query(() => User, { nullable: true })
-  async me(@Ctx() ctx: MyContext) {
-    if (!ctx.req.session.userId) {
+  async me(@Ctx() { req }: MyContext) {
+    if (!req.session.userId) {
       return null;
     }
-    const user = await ctx.em.findOne(User, {
-      id: Number(ctx.req.session.userId),
-    });
+    const user = await User.findOne(parseInt(req.session.userId));
     return user;
   }
 
   @Mutation(() => UserResponse)
   async register(
     @Arg('options') options: UserPasswordInput,
-    @Ctx() ctx: MyContext
+    @Ctx() { req }: MyContext
   ): Promise<UserResponse> {
     const errors = validateRegister(options);
     if (errors) return { errors };
     const hashedPassword = await argon2.hash(options.password);
-    const user = ctx.em.create(User, {
+    const user = User.create({
       username: options.username,
       password: hashedPassword,
       email: options.email,
     });
     try {
-      await ctx.em.persistAndFlush(user);
+      await user.save();
     } catch (e) {
       if (e.code === '23505' || e.detail.includes('already exists')) {
         // duplicate insertions of user
@@ -152,7 +149,7 @@ export class UserResolver {
         };
       }
     }
-    ctx.req.session.userId = user.id;
+    req.session.userId = user.id;
     return { user };
   }
 
@@ -160,10 +157,9 @@ export class UserResolver {
   async login(
     @Arg('usernameOrEmail') usernameOrEmail: string,
     @Arg('password') password: string,
-    @Ctx() ctx: MyContext
+    @Ctx() { req }: MyContext
   ): Promise<UserResponse> {
-    const user = await ctx.em.findOne(
-      User,
+    const user = await User.findOne(
       usernameOrEmail.includes('@')
         ? { email: usernameOrEmail }
         : { username: usernameOrEmail }
@@ -191,7 +187,7 @@ export class UserResolver {
       };
     }
 
-    ctx.req.session.userId = user.id;
+    req.session.userId = user.id;
 
     return {
       user,
