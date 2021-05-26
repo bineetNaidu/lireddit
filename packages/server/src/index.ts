@@ -1,25 +1,35 @@
 import 'reflect-metadata';
 import dotenv from 'dotenv';
 import express from 'express';
-import { ApolloServer } from 'apollo-server-express';
-import { buildSchema } from 'type-graphql';
-import { MikroORM } from '@mikro-orm/core';
 import Redis from 'ioredis';
 import session from 'express-session';
 import connectReddis from 'connect-redis';
 import cors from 'cors';
+import { ApolloServer } from 'apollo-server-express';
+import { buildSchema } from 'type-graphql';
 import { COOKIE_NAME, ___prod___ } from './constants';
-import mikroOrmConfig from './mikro-orm.config';
 import { HelloResolver } from './resolvers/hello';
 import { PostResolver } from './resolvers/post';
 import { UserResolver } from './resolvers/user';
 import { MyContext } from './types';
+import { createConnection } from 'typeorm';
+import { Post } from './entities/Post';
+import { User } from './entities/User';
 
 dotenv.config();
 
 const main = async () => {
-  const orm = await MikroORM.init(mikroOrmConfig);
-  await orm.getMigrator().up();
+  await createConnection({
+    type: 'postgres',
+    database: 'lireddit',
+    username: process.env.DB_USER!,
+    password: process.env.DB_PASSWORD!,
+    host: 'localhost',
+    port: 5432,
+    logging: true,
+    synchronize: true,
+    entities: [Post, User],
+  });
 
   const app = express();
 
@@ -58,7 +68,7 @@ const main = async () => {
       resolvers: [HelloResolver, PostResolver, UserResolver],
       validate: false,
     }),
-    context: ({ req, res }): MyContext => ({ em: orm.em, req, res, redis }),
+    context: ({ req, res }): MyContext => ({ req, res, redis }),
   });
 
   apolloServer.applyMiddleware({
@@ -69,7 +79,7 @@ const main = async () => {
   const port = process.env.PORT || 4242;
   app.listen(port, () => {
     console.log(
-      `🚀 Lireddit Server has started => http:localhost:${port}/graphql`
+      `🚀 Lireddit Server has started => http://localhost:${port}/graphql`
     );
   });
 };
