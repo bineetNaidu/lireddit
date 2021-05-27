@@ -1,17 +1,20 @@
+import NextLink from 'next/link';
+import { useState } from 'react';
 import { withUrqlClient } from 'next-urql';
 import { createURQLclient } from '../utils/createURQLclient';
 import { usePostsQuery } from '../generated/graphql';
 import { Layout } from '../components/Layout';
-import NextLink from 'next/link';
 import { Box, Flex, Heading, Link, Stack, Text } from '@chakra-ui/layout';
 import { Button } from '@chakra-ui/button';
 import { Spinner } from '@chakra-ui/spinner';
 
 const Index = () => {
+  const [variables, setVariables] = useState({
+    limit: 10,
+    cursor: null as null | string,
+  });
   const [{ data, fetching }] = usePostsQuery({
-    variables: {
-      limit: 10,
-    },
+    variables,
   });
 
   if (!fetching && !data) {
@@ -33,7 +36,7 @@ const Index = () => {
       <br />
       <hr />
       {!data && fetching ? (
-        <Spinner size="xl" />
+        <Spinner size="xl" mx="auto" />
       ) : (
         <Stack spacing={8}>
           {data!.posts.map((p) => (
@@ -46,7 +49,17 @@ const Index = () => {
       )}
       {data && (
         <Flex>
-          <Button px={8} mx="auto" my={5}>
+          <Button
+            px={8}
+            mx="auto"
+            my={5}
+            onClick={() => {
+              setVariables((prevState) => ({
+                limit: prevState.limit,
+                cursor: data.posts[data.posts.length - 1].createdAt,
+              }));
+            }}
+          >
             Load more!
           </Button>
         </Flex>
