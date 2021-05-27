@@ -5,6 +5,7 @@ import Redis from 'ioredis';
 import session from 'express-session';
 import connectReddis from 'connect-redis';
 import cors from 'cors';
+import path from 'path';
 import { ApolloServer } from 'apollo-server-express';
 import { buildSchema } from 'type-graphql';
 import { COOKIE_NAME, ___prod___ } from './constants';
@@ -19,7 +20,7 @@ import { User } from './entities/User';
 dotenv.config();
 
 const main = async () => {
-  await createConnection({
+  const conn = await createConnection({
     type: 'postgres',
     database: 'lireddit',
     username: process.env.DB_USER!,
@@ -28,8 +29,11 @@ const main = async () => {
     port: 5432,
     logging: true,
     synchronize: true,
+    migrations: [path.join(__dirname, './migrations/*')],
     entities: [Post, User],
   });
+
+  await conn.runMigrations();
 
   const app = express();
 
