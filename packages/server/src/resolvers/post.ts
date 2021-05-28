@@ -16,7 +16,6 @@ import {
 import { MyContext } from 'src/types';
 import { isAuth } from '../middlewares/isAuth';
 import { getConnection } from 'typeorm';
-// import { User } from 'src/entities/User';
 
 @InputType()
 class PostInput {
@@ -37,6 +36,39 @@ class PaginatedPosts {
 
 @Resolver(Post)
 export class PostResolver {
+  @Mutation(() => Boolean)
+  @UseMiddleware(isAuth)
+  async vote(
+    @Arg('postId', () => Int) postId: number,
+    @Arg('value', () => Int) value: number,
+    @Ctx() { req }: MyContext
+  ): Promise<Boolean> {
+    const { userId } = req.session;
+
+    const isUpdoot = value !== -1;
+    const realValue = isUpdoot ? 1 : -1;
+
+    try {
+      getConnection().query(
+        `
+        START TRANSACTION;
+
+        insert into updoot ("userId", "postId", value)
+        values (${userId}, ${postId}, ${realValue});
+
+        update post
+        set points = points + ${realValue}
+        where id = ${postId};
+
+        COMMIT;
+      `
+      );
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   @FieldResolver(() => String)
   textSnippet(@Root() root: Post) {
     return root.text.slice(0, 50) + '...';
@@ -89,7 +121,7 @@ export class PostResolver {
       replacements
     );
 
-    console.log(posts);
+    // console.log(posts);
 
     const hasMore = posts.length === reaLimitPlusOne;
     return {
