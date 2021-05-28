@@ -18,7 +18,11 @@ const Index = () => {
   });
 
   if (!fetching && !data) {
-    return <div>Something Went Wrong!</div>;
+    return (
+      <Text textAlign="center" mt={8} fontSize="xx-large" color="red">
+        Something Went Wrong!
+      </Text>
+    );
   }
 
   return (
@@ -38,8 +42,8 @@ const Index = () => {
       {!data && fetching ? (
         <Spinner size="xl" mx="auto" />
       ) : (
-        <Stack spacing={8}>
-          {data!.posts.map((p) => (
+        <Stack spacing={8} my={4}>
+          {data!.posts.posts.map((p) => (
             <Box key={p.id} p={5} shadow="md" borderWidth="1px">
               <Heading fontSize="x-large">{p.title}</Heading>
               <Text mt={4}>{p.textSnippet}</Text>
@@ -47,7 +51,7 @@ const Index = () => {
           ))}
         </Stack>
       )}
-      {data && (
+      {data && data.posts.hasMore && (
         <Flex>
           <Button
             px={8}
@@ -56,7 +60,7 @@ const Index = () => {
             onClick={() => {
               setVariables((prevState) => ({
                 limit: prevState.limit,
-                cursor: data.posts[data.posts.length - 1].createdAt,
+                cursor: data.posts.posts[data.posts.posts.length - 1].createdAt,
               }));
             }}
           >
