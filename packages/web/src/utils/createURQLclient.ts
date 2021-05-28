@@ -1,4 +1,9 @@
-import { dedupExchange, fetchExchange, stringifyVariables } from '@urql/core';
+import {
+  dedupExchange,
+  fetchExchange,
+  stringifyVariables,
+  gql,
+} from '@urql/core';
 import { cacheExchange, Resolver } from '@urql/exchange-graphcache';
 import {
   LogoutMutation,
@@ -6,6 +11,7 @@ import {
   MeDocument,
   LoginMutation,
   RegisterMutation,
+  VoteMutationVariables,
 } from '../generated/graphql';
 import { betterUpdateQuery } from './betterUpdateQuery';
 import { Exchange } from 'urql';
@@ -135,6 +141,30 @@ export const createURQLclient = (ssrExchange: any) => ({
       },
       updates: {
         Mutation: {
+          vote: (_result, args, cache, _info) => {
+            const { postId, value } = args as VoteMutationVariables;
+            const data = cache.readFragment(
+              gql`
+                fragment _ on Post {
+                  id
+                  points
+                }
+              `,
+              { id: postId }
+            );
+
+            if (data) {
+              const newPoints = (data.points as number) + value;
+              cache.writeFragment(
+                gql`
+                  fragment __ on Post {
+                    points
+                  }
+                `,
+                { id: postId, points: newPoints }
+              );
+            }
+          },
           createPost: (_result, _args, cache, _info) => {
             const allFields = cache.inspectFields('Query');
             const fieldInfos = allFields.filter(
