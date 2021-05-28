@@ -7,6 +7,7 @@ import { Layout } from '../components/Layout';
 import { Box, Flex, Heading, Link, Stack, Text } from '@chakra-ui/layout';
 import { Button } from '@chakra-ui/button';
 import { Spinner } from '@chakra-ui/spinner';
+import { UpdootLabel } from '../components/UpdootLabel';
 
 const Index = () => {
   const [variables, setVariables] = useState({
@@ -40,22 +41,27 @@ const Index = () => {
       <br />
       <hr />
       {!data && fetching ? (
-        <Spinner size="xl" mx="auto" />
+        <Flex justifyContent="center">
+          <Spinner size="xl" mx="auto" />
+        </Flex>
       ) : (
         <Stack spacing={8} my={4}>
           {data!.posts.posts.map((p) => (
-            <Box key={p.id} p={5} shadow="md" borderWidth="1px">
-              <Heading fontSize="x-large">{p.title}</Heading>
-              <Text
-                fontSize="small"
-                fontStyle="italic"
-                fontWeight={200}
-                letterSpacing="0.8px"
-              >
-                @{p.creator.username}
-              </Text>
-              <Text mt={4}>{p.textSnippet}</Text>
-            </Box>
+            <Flex key={p.id} p={5} shadow="md" borderWidth="1px">
+              <UpdootLabel post={p} />
+              <Box ml={3}>
+                <Heading fontSize="x-large">{p.title}</Heading>
+                <Text
+                  fontSize="small"
+                  fontStyle="italic"
+                  fontWeight={200}
+                  letterSpacing="0.8px"
+                >
+                  @{p.creator.username}
+                </Text>
+                <Text mt={4}>{p.textSnippet}</Text>
+              </Box>
+            </Flex>
           ))}
         </Stack>
       )}

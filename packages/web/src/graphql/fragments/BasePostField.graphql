@@ -1,0 +1,11 @@
+fragment BasePostField on Post {
+  id
+  title
+  createdAt
+  textSnippet
+  points
+  creator {
+    id
+    username
+  }
+}

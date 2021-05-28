@@ -149,6 +149,15 @@ export type BaseErrorsFragment = (
   & Pick<FieldError, 'field' | 'message'>
 );
 
+export type BasePostFieldFragment = (
+  { __typename?: 'Post' }
+  & Pick<Post, 'id' | 'title' | 'createdAt' | 'textSnippet' | 'points'>
+  & { creator: (
+    { __typename?: 'User' }
+    & Pick<User, 'id' | 'username'>
+  ) }
+);
+
 export type BaseUserFieldsFragment = (
   { __typename?: 'User' }
   & Pick<User, 'id' | 'username'>
@@ -237,6 +246,17 @@ export type RegisterMutation = (
   ) }
 );
 
+export type VoteMutationVariables = Exact<{
+  value: Scalars['Int'];
+  postId: Scalars['Int'];
+}>;
+
+
+export type VoteMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'vote'>
+);
+
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -261,15 +281,24 @@ export type PostsQuery = (
     & Pick<PaginatedPosts, 'hasMore'>
     & { posts: Array<(
       { __typename?: 'Post' }
-      & Pick<Post, 'id' | 'title' | 'createdAt' | 'textSnippet' | 'points'>
-      & { creator: (
-        { __typename?: 'User' }
-        & Pick<User, 'id' | 'username'>
-      ) }
+      & BasePostFieldFragment
     )> }
   ) }
 );
 
+export const BasePostFieldFragmentDoc = gql`
+    fragment BasePostField on Post {
+  id
+  title
+  createdAt
+  textSnippet
+  points
+  creator {
+    id
+    username
+  }
+}
+    `;
 export const BaseErrorsFragmentDoc = gql`
     fragment BaseErrors on FieldError {
   field
@@ -358,6 +387,15 @@ export const RegisterDocument = gql`
 export function useRegisterMutation() {
   return Urql.useMutation<RegisterMutation, RegisterMutationVariables>(RegisterDocument);
 };
+export const VoteDocument = gql`
+    mutation Vote($value: Int!, $postId: Int!) {
+  vote(value: $value, postId: $postId)
+}
+    `;
+
+export function useVoteMutation() {
+  return Urql.useMutation<VoteMutation, VoteMutationVariables>(VoteDocument);
+};
 export const MeDocument = gql`
     query Me {
   me {
@@ -374,19 +412,11 @@ export const PostsDocument = gql`
   posts(limit: $limit, cursor: $cursor) {
     hasMore
     posts {
-      id
-      title
-      createdAt
-      textSnippet
-      points
-      creator {
-        id
-        username
-      }
+      ...BasePostField
     }
   }
 }
-    `;
+    ${BasePostFieldFragmentDoc}`;
 
 export function usePostsQuery(options: Omit<Urql.UseQueryArgs<PostsQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<PostsQuery>({ query: PostsDocument, ...options });
