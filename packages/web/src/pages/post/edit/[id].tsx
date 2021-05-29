@@ -3,7 +3,7 @@ import { Formik, Form } from 'formik';
 import { withUrqlClient } from 'next-urql';
 import { InputField } from '../../../components/InputField';
 import { Layout } from '../../../components/Layout';
-import { useGetPostFromUrl } from '../../../hooks/useGetPostFromUrl';
+import { useGetPostFromUrl } from '../../../hooks/useGetIntId';
 import { createURQLclient } from '../../../utils/createURQLclient';
 import {
   useGetPostQuery,

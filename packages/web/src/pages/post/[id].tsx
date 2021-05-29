@@ -2,7 +2,7 @@ import { withUrqlClient } from 'next-urql';
 import { Box, Flex, Heading, Spinner, Text } from '@chakra-ui/react';
 import { createURQLclient } from '../../utils/createURQLclient';
 import { Layout } from '../../components/Layout';
-import { useGetPostFromUrl } from '../../hooks/useGetPostFromUrl';
+import { useGetPostFromUrl } from '../../hooks/useGetIntId';
 import { useGetPostQuery } from '../../generated/graphql';
 
 const Post = () => {
