@@ -13,7 +13,6 @@ export const UpdootLabel: FC<Props> = ({ post }) => {
       'not-loading'
     );
   const [, vote] = useVoteMutation();
-  console.log(post.voteStatus);
 
   const handleUpdoot = async () => {
     if (post.voteStatus === 1) return;
