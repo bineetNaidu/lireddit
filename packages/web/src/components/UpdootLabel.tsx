@@ -13,14 +13,17 @@ export const UpdootLabel: FC<Props> = ({ post }) => {
       'not-loading'
     );
   const [, vote] = useVoteMutation();
+  console.log(post.voteStatus);
 
   const handleUpdoot = async () => {
+    if (post.voteStatus === 1) return;
     setLoading('updoot-loading');
     await vote({ postId: post.id, value: 1 });
     setLoading('not-loading');
   };
 
   const handleDowndoot = async () => {
+    if (post.voteStatus === -1) return;
     setLoading('downdoot-loading');
     await vote({ postId: post.id, value: -1 });
     setLoading('not-loading');
@@ -32,6 +35,7 @@ export const UpdootLabel: FC<Props> = ({ post }) => {
         size="xs"
         isLoading={loading === 'updoot-loading'}
         onClick={handleUpdoot}
+        colorScheme={post.voteStatus === 1 ? 'green' : undefined}
       >
         <ChevronUpIcon size="24px" />
       </IconButton>
@@ -41,6 +45,7 @@ export const UpdootLabel: FC<Props> = ({ post }) => {
         size="xs"
         isLoading={loading === 'downdoot-loading'}
         onClick={handleDowndoot}
+        colorScheme={post.voteStatus === -1 ? 'red' : undefined}
       >
         <ChevronDownIcon size="24px" />
       </IconButton>

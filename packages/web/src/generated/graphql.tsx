@@ -94,6 +94,7 @@ export type Post = {
   title: Scalars['String'];
   text: Scalars['String'];
   points: Scalars['Float'];
+  voteStatus?: Maybe<Scalars['Int']>;
   creatorId: Scalars['Float'];
   creator: User;
   textSnippet: Scalars['String'];
@@ -151,7 +152,7 @@ export type BaseErrorsFragment = (
 
 export type BasePostFieldFragment = (
   { __typename?: 'Post' }
-  & Pick<Post, 'id' | 'title' | 'createdAt' | 'textSnippet' | 'points'>
+  & Pick<Post, 'id' | 'title' | 'createdAt' | 'textSnippet' | 'points' | 'voteStatus'>
   & { creator: (
     { __typename?: 'User' }
     & Pick<User, 'id' | 'username'>
@@ -293,6 +294,7 @@ export const BasePostFieldFragmentDoc = gql`
   createdAt
   textSnippet
   points
+  voteStatus
   creator {
     id
     username

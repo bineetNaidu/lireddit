@@ -4,6 +4,7 @@ fragment BasePostField on Post {
   createdAt
   textSnippet
   points
+  voteStatus
   creator {
     id
     username
