@@ -50,7 +50,11 @@ const Index = () => {
             <Flex key={p.id} p={5} shadow="md" borderWidth="1px">
               <UpdootLabel post={p} />
               <Box ml={3}>
-                <Heading fontSize="x-large">{p.title}</Heading>
+                <NextLink href={`/post/${p.id}`}>
+                  <Link>
+                    <Heading fontSize="x-large">{p.title}</Heading>
+                  </Link>
+                </NextLink>
                 <Text
                   fontSize="small"
                   fontStyle="italic"
