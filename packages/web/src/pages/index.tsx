@@ -66,14 +66,16 @@ const Index = () => {
                     {p.textSnippet}
                   </Text>
                   <Box position="absolute" top={4} right={4}>
-                    <IconButton
-                      aria-label="edit button"
-                      mr={2}
-                      colorScheme="teal"
-                      variant="ghost"
-                    >
-                      <EditIcon />
-                    </IconButton>
+                    <NextLink href={`/post/edit/${p.id}`}>
+                      <IconButton
+                        aria-label="edit button"
+                        mr={2}
+                        colorScheme="teal"
+                        variant="ghost"
+                      >
+                        <EditIcon />
+                      </IconButton>
+                    </NextLink>
                     <IconButton
                       aria-label="delete button"
                       colorScheme="red"
