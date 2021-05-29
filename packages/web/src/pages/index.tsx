@@ -28,18 +28,6 @@ const Index = () => {
 
   return (
     <Layout>
-      <Flex>
-        <Heading fontFamily="monospace" fontSize="xxx-large">
-          LiReddit
-        </Heading>
-        <Box ml="auto" mt="auto" mb="auto">
-          <NextLink href="/create-post">
-            <Link>Create Post</Link>
-          </NextLink>
-        </Box>
-      </Flex>
-      <br />
-      <hr />
       {!data && fetching ? (
         <Flex justifyContent="center">
           <Spinner size="xl" mx="auto" />
