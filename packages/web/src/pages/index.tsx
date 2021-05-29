@@ -2,7 +2,11 @@ import NextLink from 'next/link';
 import { useState } from 'react';
 import { withUrqlClient } from 'next-urql';
 import { createURQLclient } from '../utils/createURQLclient';
-import { useDeletePostMutation, usePostsQuery } from '../generated/graphql';
+import {
+  useDeletePostMutation,
+  usePostsQuery,
+  useMeQuery,
+} from '../generated/graphql';
 import { Layout } from '../components/Layout';
 import { Box, Flex, Heading, Link, Stack, Text } from '@chakra-ui/layout';
 import { Button, IconButton } from '@chakra-ui/button';
@@ -18,6 +22,7 @@ const Index = () => {
   const [{ data, fetching }] = usePostsQuery({
     variables,
   });
+  const [{ data: meData }] = useMeQuery();
 
   const [, deletePost] = useDeletePostMutation();
 
@@ -65,26 +70,28 @@ const Index = () => {
                   <Text flex={1} mt={4}>
                     {p.textSnippet}
                   </Text>
-                  <Box position="absolute" top={4} right={4}>
-                    <NextLink href={`/post/edit/${p.id}`}>
+                  {p.creator.id !== meData?.me?.id ? null : (
+                    <Box position="absolute" top={4} right={4}>
+                      <NextLink href={`/post/edit/${p.id}`}>
+                        <IconButton
+                          aria-label="edit button"
+                          mr={2}
+                          colorScheme="teal"
+                          variant="ghost"
+                        >
+                          <EditIcon />
+                        </IconButton>
+                      </NextLink>
                       <IconButton
-                        aria-label="edit button"
-                        mr={2}
-                        colorScheme="teal"
+                        aria-label="delete button"
+                        colorScheme="red"
                         variant="ghost"
+                        onClick={async () => await deletePost({ id: p.id })}
                       >
-                        <EditIcon />
+                        <DeleteIcon />
                       </IconButton>
-                    </NextLink>
-                    <IconButton
-                      aria-label="delete button"
-                      colorScheme="red"
-                      variant="ghost"
-                      onClick={async () => await deletePost({ id: p.id })}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </Box>
+                    </Box>
+                  )}
                 </Box>
               </Flex>
             )
