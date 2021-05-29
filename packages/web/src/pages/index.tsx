@@ -2,12 +2,13 @@ import NextLink from 'next/link';
 import { useState } from 'react';
 import { withUrqlClient } from 'next-urql';
 import { createURQLclient } from '../utils/createURQLclient';
-import { usePostsQuery } from '../generated/graphql';
+import { useDeletePostMutation, usePostsQuery } from '../generated/graphql';
 import { Layout } from '../components/Layout';
 import { Box, Flex, Heading, Link, Stack, Text } from '@chakra-ui/layout';
-import { Button } from '@chakra-ui/button';
+import { Button, IconButton } from '@chakra-ui/button';
 import { Spinner } from '@chakra-ui/spinner';
 import { UpdootLabel } from '../components/UpdootLabel';
+import { DeleteIcon, EditIcon } from '@chakra-ui/icons';
 
 const Index = () => {
   const [variables, setVariables] = useState({
@@ -17,6 +18,8 @@ const Index = () => {
   const [{ data, fetching }] = usePostsQuery({
     variables,
   });
+
+  const [, deletePost] = useDeletePostMutation();
 
   if (!fetching && !data) {
     return (
@@ -34,27 +37,56 @@ const Index = () => {
         </Flex>
       ) : (
         <Stack spacing={8} my={4}>
-          {data!.posts.posts.map((p) => (
-            <Flex key={p.id} p={5} shadow="md" borderWidth="1px">
-              <UpdootLabel post={p} />
-              <Box ml={3}>
-                <NextLink href={`/post/${p.id}`}>
-                  <Link>
-                    <Heading fontSize="x-large">{p.title}</Heading>
-                  </Link>
-                </NextLink>
-                <Text
-                  fontSize="small"
-                  fontStyle="italic"
-                  fontWeight={200}
-                  letterSpacing="0.8px"
-                >
-                  @{p.creator.username}
-                </Text>
-                <Text mt={4}>{p.textSnippet}</Text>
-              </Box>
-            </Flex>
-          ))}
+          {data!.posts.posts.map((p) =>
+            !p ? null : (
+              <Flex
+                key={p.id}
+                p={5}
+                shadow="md"
+                borderWidth="1px"
+                position="relative"
+              >
+                <UpdootLabel post={p} />
+                <Box ml={3} flex={1}>
+                  <NextLink href={`/post/${p.id}`}>
+                    <Link>
+                      <Heading fontSize="x-large">{p.title}</Heading>
+                    </Link>
+                  </NextLink>
+                  <Text
+                    fontSize="small"
+                    fontStyle="italic"
+                    fontWeight={200}
+                    letterSpacing="0.8px"
+                  >
+                    @{p.creator.username}
+                  </Text>
+
+                  <Text flex={1} mt={4}>
+                    {p.textSnippet}
+                  </Text>
+                  <Box position="absolute" top={4} right={4}>
+                    <IconButton
+                      aria-label="edit button"
+                      mr={2}
+                      colorScheme="teal"
+                      variant="ghost"
+                    >
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton
+                      aria-label="delete button"
+                      colorScheme="red"
+                      variant="ghost"
+                      onClick={async () => await deletePost({ id: p.id })}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </Box>
+                </Box>
+              </Flex>
+            )
+          )}
         </Stack>
       )}
       {data && data.posts.hasMore && (
