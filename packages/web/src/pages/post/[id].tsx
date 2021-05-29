@@ -3,9 +3,14 @@ import { Box, Flex, Heading, Spinner, Text } from '@chakra-ui/react';
 import { createURQLclient } from '../../utils/createURQLclient';
 import { Layout } from '../../components/Layout';
 import { useGetPostFromUrl } from '../../hooks/useGetPostFromUrl';
+import { useGetPostQuery } from '../../generated/graphql';
 
 const Post = () => {
-  const [{ data, fetching }] = useGetPostFromUrl();
+  const intId = useGetPostFromUrl();
+  const [{ data, fetching }] = useGetPostQuery({
+    pause: intId === -1,
+    variables: { id: intId },
+  });
 
   if (fetching) {
     return (
