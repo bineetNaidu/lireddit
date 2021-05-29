@@ -1,22 +1,21 @@
 import { Text, Flex, Heading } from '@chakra-ui/react';
-import { Container } from '../components/Container';
+import { Layout } from '../components/Layout';
 
 const product = () => (
-  <Container height="100vh">
+  <Layout variant="regular">
     <Flex
       justifyContent="center"
       alignItems="center"
-      height="100vh"
       bgGradient="linear(to-l, #7928CA, #FF0080)"
       bgClip="text"
     >
       <Heading fontSize="6vw">Lireddit</Heading>
     </Flex>
 
-    <Flex as="footer" py="8rem">
+    <Flex as="footer">
       <Text>Next ❤️ Chakra</Text>
     </Flex>
-  </Container>
+  </Layout>
 );
 
 export default product;
