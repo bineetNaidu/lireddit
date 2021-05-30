@@ -7,13 +7,11 @@ import { Button } from '@chakra-ui/button';
 import { useRegisterMutation } from '../generated/graphql';
 import { toErrorMap } from '../utils/toErrorMap';
 import { useRouter } from 'next/dist/client/router';
-import { withUrqlClient } from 'next-urql';
-import { createURQLclient } from '../utils/createURQLclient';
 
 interface Props {}
 
 const register: FC<Props> = ({}) => {
-  const [, register] = useRegisterMutation();
+  const [register] = useRegisterMutation();
   const router = useRouter();
 
   return (
@@ -21,7 +19,7 @@ const register: FC<Props> = ({}) => {
       <Formik
         initialValues={{ username: '', password: '', email: '' }}
         onSubmit={async (values, { setErrors }) => {
-          const res = await register({ options: values });
+          const res = await register({ variables: { options: values } });
 
           if (res.data?.register.errors) {
             setErrors(toErrorMap(res.data.register.errors));
@@ -68,4 +66,4 @@ const register: FC<Props> = ({}) => {
   );
 };
 
-export default withUrqlClient(createURQLclient)(register);
+export default register;

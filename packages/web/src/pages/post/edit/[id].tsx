@@ -1,10 +1,8 @@
 import { Box, Flex, Button, Text, Spinner } from '@chakra-ui/react';
 import { Formik, Form } from 'formik';
-import { withUrqlClient } from 'next-urql';
 import { InputField } from '../../../components/InputField';
 import { Layout } from '../../../components/Layout';
 import { useGetPostFromUrl } from '../../../hooks/useGetIntId';
-import { createURQLclient } from '../../../utils/createURQLclient';
 import {
   useGetPostQuery,
   useUpdatePostMutation,
@@ -14,13 +12,13 @@ import { useRouter } from 'next/router';
 const EditPost = () => {
   const router = useRouter();
   const intId = useGetPostFromUrl();
-  const [{ data, fetching }] = useGetPostQuery({
-    pause: intId === -1,
+  const { data, loading } = useGetPostQuery({
+    skip: intId === -1,
     variables: { id: intId },
   });
-  const [, updatePost] = useUpdatePostMutation();
+  const [updatePost] = useUpdatePostMutation();
 
-  if (fetching) {
+  if (loading) {
     return (
       <Layout>
         <Flex justifyContent="center">
@@ -30,7 +28,7 @@ const EditPost = () => {
     );
   }
 
-  if (!fetching && !data) {
+  if (!loading && !data) {
     return (
       <Layout>
         <Text textAlign="center" mt={8} fontSize="xx-large" color="red">
@@ -54,7 +52,7 @@ const EditPost = () => {
       <Formik
         initialValues={{ text: data.post.text, title: data.post.title }}
         onSubmit={async (values) => {
-          const res = await updatePost({ id: intId, ...values });
+          const res = await updatePost({ variables: { id: intId, ...values } });
 
           if (res.data?.updatePost) {
             router.push(`/post/${intId}`);
@@ -89,4 +87,4 @@ const EditPost = () => {
   );
 };
 
-export default withUrqlClient(createURQLclient)(EditPost);
+export default EditPost;

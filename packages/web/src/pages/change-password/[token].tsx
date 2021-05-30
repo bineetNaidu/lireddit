@@ -8,12 +8,10 @@ import { InputField } from '../../components/InputField';
 import { Wrapper } from '../../components/Wrapper';
 import { toErrorMap } from '../../utils/toErrorMap';
 import { useChangePasswordMutation } from '../../generated/graphql';
-import { withUrqlClient } from 'next-urql';
-import { createURQLclient } from '../../utils/createURQLclient';
 
 const ChangePassword: NextPage<{}> = () => {
   const router = useRouter();
-  const [, changePassword] = useChangePasswordMutation();
+  const [changePassword] = useChangePasswordMutation();
   const [tokenErr, setTokenErr] = useState('');
   return (
     <Wrapper variant="small">
@@ -21,9 +19,13 @@ const ChangePassword: NextPage<{}> = () => {
         initialValues={{ newPassword: '' }}
         onSubmit={async (values, { setErrors }) => {
           const res = await changePassword({
-            newPassword: values.newPassword,
-            token:
-              typeof router.query.token === 'string' ? router.query.token : '',
+            variables: {
+              newPassword: values.newPassword,
+              token:
+                typeof router.query.token === 'string'
+                  ? router.query.token
+                  : '',
+            },
           });
 
           if (res.data?.changePassword!.errors) {
@@ -72,4 +74,4 @@ const ChangePassword: NextPage<{}> = () => {
   );
 };
 
-export default withUrqlClient(createURQLclient)(ChangePassword);
+export default ChangePassword;
