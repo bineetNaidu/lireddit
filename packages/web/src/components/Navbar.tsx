@@ -4,12 +4,14 @@ import { useLogoutMutation, useMeQuery } from '../generated/graphql';
 import { Spinner } from '@chakra-ui/spinner';
 import { Button } from '@chakra-ui/button';
 import { isServer } from '../utils/isServer';
+import { useRouter } from 'next/router';
 
 const Navbar = () => {
   const [{ data, fetching }] = useMeQuery({
     pause: isServer(),
   });
   const [{ fetching: isLogoutLoading }, logout] = useLogoutMutation();
+  const router = useRouter();
 
   let body = null;
 
@@ -40,7 +42,10 @@ const Navbar = () => {
         </NextLink>
 
         <Button
-          onClick={() => logout()}
+          onClick={async () => {
+            await logout();
+            router.reload();
+          }}
           isLoading={isLogoutLoading}
           // variant="link"
         >
