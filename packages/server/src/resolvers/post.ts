@@ -17,6 +17,7 @@ import { MyContext } from 'src/types';
 import { isAuth } from '../middlewares/isAuth';
 import { getConnection } from 'typeorm';
 import { Updoot } from '../entities/Updoot';
+import { User } from '../entities/User';
 
 @InputType()
 class PostInput {
@@ -37,6 +38,11 @@ class PaginatedPosts {
 
 @Resolver(Post)
 export class PostResolver {
+  @FieldResolver(() => User)
+  creator(@Root() post: Post, @Ctx() { userLoader }: MyContext) {
+    return userLoader.load(post.creatorId);
+  }
+
   @Mutation(() => Boolean)
   @UseMiddleware(isAuth)
   async vote(
@@ -143,19 +149,12 @@ export class PostResolver {
       `
       select
       p.*,
-      json_build_object(
-        'id', u.id,
-        'username', u.username,
-        'email', u.email
-      ) as creator,
       ${
         userId
           ? `(select value from updoot where "userId" = $2 and "postId" = p.id) "voteStatus"`
           : 'null as "voteStatus"'
       }
       from post as p
-      inner join public.user as u
-      on u.id = p."creatorId"
       ${cursor ? `where p."createdAt" < $${cursorIdx}` : ''}
       order by p."createdAt" DESC
       limit $1
@@ -174,7 +173,7 @@ export class PostResolver {
 
   @Query(() => Post, { nullable: true })
   post(@Arg('id') id: number): Promise<Post | undefined> {
-    return Post.findOne(id, { relations: ['creator'] });
+    return Post.findOne(id);
   }
 
   @Mutation(() => Post)
