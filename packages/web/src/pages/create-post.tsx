@@ -5,6 +5,7 @@ import { InputField } from '../components/InputField';
 import { Layout } from '../components/Layout';
 import { useCreatePostMutation } from '../generated/graphql';
 import { useIsAuth } from '../hooks/useIsAuth';
+import { withApollo } from '../lib/withApollo';
 
 const CreatePost = () => {
   const router = useRouter();
@@ -49,4 +50,4 @@ const CreatePost = () => {
   );
 };
 
-export default CreatePost;
+export default withApollo()(CreatePost);

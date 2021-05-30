@@ -8,6 +8,7 @@ import {
   useUpdatePostMutation,
 } from '../../../generated/graphql';
 import { useRouter } from 'next/router';
+import { withApollo } from '../../../lib/withApollo';
 
 const EditPost = () => {
   const router = useRouter();
@@ -87,4 +88,4 @@ const EditPost = () => {
   );
 };
 
-export default EditPost;
+export default withApollo()(EditPost);

@@ -7,6 +7,7 @@ import { Button } from '@chakra-ui/button';
 import { useRegisterMutation } from '../generated/graphql';
 import { toErrorMap } from '../utils/toErrorMap';
 import { useRouter } from 'next/dist/client/router';
+import { withApollo } from '../lib/withApollo';
 
 interface Props {}
 
@@ -66,4 +67,4 @@ const register: FC<Props> = ({}) => {
   );
 };
 
-export default register;
+export default withApollo()(register);

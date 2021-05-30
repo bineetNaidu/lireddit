@@ -2,6 +2,7 @@ import { Box, Flex, Heading, Spinner, Text } from '@chakra-ui/react';
 import { Layout } from '../../components/Layout';
 import { useGetPostFromUrl } from '../../hooks/useGetIntId';
 import { useGetPostQuery } from '../../generated/graphql';
+import { withApollo } from '../../lib/withApollo';
 
 const Post = () => {
   const intId = useGetPostFromUrl();
@@ -48,4 +49,4 @@ const Post = () => {
   );
 };
 
-export default Post;
+export default withApollo({ ssr: true })(Post);

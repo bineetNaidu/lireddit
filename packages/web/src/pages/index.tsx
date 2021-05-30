@@ -10,6 +10,7 @@ import { Button, IconButton } from '@chakra-ui/button';
 import { Spinner } from '@chakra-ui/spinner';
 import { UpdootLabel } from '../components/UpdootLabel';
 import { DeleteIcon, EditIcon } from '@chakra-ui/icons';
+import { withApollo } from '../lib/withApollo';
 
 const Index = () => {
   const { data, loading, fetchMore } = usePostsQuery({
@@ -122,4 +123,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default withApollo({ ssr: true })(Index);
