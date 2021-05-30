@@ -13,7 +13,7 @@ import {
   Root,
   ObjectType,
 } from 'type-graphql';
-import { MyContext } from 'src/types';
+import { MyContext } from '../types';
 import { isAuth } from '../middlewares/isAuth';
 import { getConnection } from 'typeorm';
 import { Updoot } from '../entities/Updoot';
@@ -41,6 +41,16 @@ export class PostResolver {
   @FieldResolver(() => User)
   creator(@Root() post: Post, @Ctx() { userLoader }: MyContext) {
     return userLoader.load(post.creatorId);
+  }
+  @FieldResolver(() => Int, { nullable: true })
+  async voteStatus(
+    @Root() post: Post,
+    @Ctx() { updootLoader, req }: MyContext
+  ) {
+    const userId = req.session.userId;
+    if (!userId) return null;
+    const updoot = await updootLoader.load({ postId: post.id, userId });
+    return updoot ? updoot.value : null;
   }
 
   @Mutation(() => Boolean)
@@ -113,49 +123,24 @@ export class PostResolver {
   @Query(() => PaginatedPosts)
   async posts(
     @Arg('limit', () => Int) limit: number,
-    @Ctx() { req }: MyContext,
     @Arg('cursor', () => String, { nullable: true }) cursor: string | null
   ): Promise<PaginatedPosts> {
     // 20 -> 21
     const realLimit = Math.min(50, limit);
     const reaLimitPlusOne = realLimit + 1;
-    // const qb = getConnection()
-    //   .getRepository(Post)
-    //   .createQueryBuilder('p')
-    //   .innerJoinAndSelect('p.creatorId', 'u', 'u.id = p."creatorId"')
-    //   .orderBy('p."createdAt"', 'DESC')
-    //   .take(reaLimitPlusOne);
 
-    // if (cursor) {
-    //   qb.where('p."createdAt" < :cursor', {
-    //     cursor: new Date(parseInt(cursor)),
-    //   });
-    // }
-    // const posts = await qb.getMany();
-    const userId = req.session.userId;
     const replacements: any[] = [reaLimitPlusOne];
 
-    if (userId) {
-      replacements.push(parseInt(userId));
-    }
-
-    let cursorIdx = 3;
     if (cursor) {
       replacements.push(new Date(parseInt(cursor)));
-      cursorIdx = replacements.length;
     }
 
     const posts = await getConnection().query(
       `
       select
-      p.*,
-      ${
-        userId
-          ? `(select value from updoot where "userId" = $2 and "postId" = p.id) "voteStatus"`
-          : 'null as "voteStatus"'
-      }
+      p.*
       from post as p
-      ${cursor ? `where p."createdAt" < $${cursorIdx}` : ''}
+      ${cursor ? `where p."createdAt" < $2` : ''}
       order by p."createdAt" DESC
       limit $1
     `,
