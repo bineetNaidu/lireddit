@@ -44,10 +44,10 @@ const main = async () => {
 
   const RedisStore = connectReddis(session);
   const redis = new Redis();
-
+  app.set('trust proxy', 1);
   app.use(
     cors({
-      origin: 'http://localhost:3000',
+      origin: process.env.CORS_ORIGIN,
       credentials: true,
     })
   );
@@ -61,7 +61,7 @@ const main = async () => {
         disableTTL: true,
       }),
       saveUninitialized: false,
-      secret: 'dksuahkasdmasbdgsadjjysays',
+      secret: process.env.COOKIE_SECRET!,
       resave: false,
       cookie: {
         maxAge: 1000 * 60 * 60 * 24 * 30, //? 1 month
