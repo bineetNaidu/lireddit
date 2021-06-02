@@ -4,12 +4,12 @@ import { PaginatedPosts } from '../generated/graphql';
 import { NextPageContext } from 'next';
 import { isServer } from '../utils/isServer';
 
-const createClient = (ctx: NextPageContext) =>
+const createClient = (ctx?: NextPageContext) =>
   new ApolloClient({
     uri: 'http://localhost:4242/graphql',
     credentials: 'include',
     headers: {
-      cookie: (isServer() ? ctx.req?.headers.cookie : undefined) || '',
+      cookie: (isServer() ? ctx?.req?.headers.cookie : undefined) || '',
     },
     cache: new InMemoryCache({
       typePolicies: {

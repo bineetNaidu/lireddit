@@ -8,6 +8,7 @@ import {
 } from '../generated/graphql';
 import gql from 'graphql-tag';
 import { ApolloCache } from '@apollo/client';
+import { useRouter } from 'next/router';
 
 interface Props {
   post: BasePostFieldFragment;
@@ -52,12 +53,15 @@ const updateAfterVote = (
 };
 
 export const UpdootLabel: FC<Props> = ({ post }) => {
+  const router = useRouter();
   const [loading, setLoading] =
     useState<'updoot-loading' | 'downdoot-loading' | 'not-loading'>(
       'not-loading'
     );
-  const [vote] = useVoteMutation();
-
+  const [vote, { error }] = useVoteMutation();
+  if (error && error.message.toLowerCase().includes('not authenticated')) {
+    router.replace('/login');
+  }
   const handleUpdoot = async () => {
     if (post.voteStatus === 1) return;
     setLoading('updoot-loading');
