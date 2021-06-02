@@ -1,7 +1,4 @@
 import NextLink from 'next/link';
-import { useState } from 'react';
-import { withUrqlClient } from 'next-urql';
-import { createURQLclient } from '../utils/createURQLclient';
 import {
   useDeletePostMutation,
   usePostsQuery,
@@ -13,20 +10,21 @@ import { Button, IconButton } from '@chakra-ui/button';
 import { Spinner } from '@chakra-ui/spinner';
 import { UpdootLabel } from '../components/UpdootLabel';
 import { DeleteIcon, EditIcon } from '@chakra-ui/icons';
+import { withApollo } from '../lib/withApollo';
 
 const Index = () => {
-  const [variables, setVariables] = useState({
-    limit: 15,
-    cursor: null as null | string,
+  const { data, loading, fetchMore } = usePostsQuery({
+    variables: {
+      limit: 15,
+      cursor: null,
+    },
+    notifyOnNetworkStatusChange: true,
   });
-  const [{ data, fetching }] = usePostsQuery({
-    variables,
-  });
-  const [{ data: meData }] = useMeQuery();
+  const { data: meData } = useMeQuery();
 
-  const [, deletePost] = useDeletePostMutation();
+  const [deletePost] = useDeletePostMutation();
 
-  if (!fetching && !data) {
+  if (!loading && !data) {
     return (
       <Text textAlign="center" mt={8} fontSize="xx-large" color="red">
         Something Went Wrong!
@@ -36,7 +34,7 @@ const Index = () => {
 
   return (
     <Layout>
-      {!data && fetching ? (
+      {!data && loading ? (
         <Flex justifyContent="center">
           <Spinner size="xl" mx="auto" />
         </Flex>
@@ -86,7 +84,14 @@ const Index = () => {
                         aria-label="delete button"
                         colorScheme="red"
                         variant="ghost"
-                        onClick={async () => await deletePost({ id: p.id })}
+                        onClick={async () =>
+                          await deletePost({
+                            variables: { id: p.id },
+                            update: (cache) => {
+                              cache.evict({ id: 'Post:' + p.id });
+                            },
+                          })
+                        }
                       >
                         <DeleteIcon />
                       </IconButton>
@@ -104,11 +109,15 @@ const Index = () => {
             px={8}
             mx="auto"
             my={5}
+            isLoading={loading}
             onClick={() => {
-              setVariables((prevState) => ({
-                limit: prevState.limit,
-                cursor: data.posts.posts[data.posts.posts.length - 1].createdAt,
-              }));
+              fetchMore({
+                variables: {
+                  limit: 15,
+                  cursor:
+                    data.posts.posts[data.posts.posts.length - 1].createdAt,
+                },
+              });
             }}
           >
             Load more!
@@ -119,4 +128,4 @@ const Index = () => {
   );
 };
 
-export default withUrqlClient(createURQLclient, { ssr: true })(Index);
+export default withApollo({ ssr: true })(Index);

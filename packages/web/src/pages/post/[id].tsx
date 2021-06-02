@@ -1,18 +1,17 @@
-import { withUrqlClient } from 'next-urql';
 import { Box, Flex, Heading, Spinner, Text } from '@chakra-ui/react';
-import { createURQLclient } from '../../utils/createURQLclient';
 import { Layout } from '../../components/Layout';
 import { useGetPostFromUrl } from '../../hooks/useGetIntId';
 import { useGetPostQuery } from '../../generated/graphql';
+import { withApollo } from '../../lib/withApollo';
 
 const Post = () => {
   const intId = useGetPostFromUrl();
-  const [{ data, fetching }] = useGetPostQuery({
-    pause: intId === -1,
+  const { data, loading } = useGetPostQuery({
+    skip: intId === -1,
     variables: { id: intId },
   });
 
-  if (fetching) {
+  if (loading) {
     return (
       <Layout>
         <Flex justifyContent="center">
@@ -22,7 +21,7 @@ const Post = () => {
     );
   }
 
-  if (!fetching && !data) {
+  if (!loading && !data) {
     return (
       <Layout>
         <Text textAlign="center" mt={8} fontSize="xx-large" color="red">
@@ -50,4 +49,4 @@ const Post = () => {
   );
 };
 
-export default withUrqlClient(createURQLclient, { ssr: true })(Post);
+export default withApollo({ ssr: true })(Post);
