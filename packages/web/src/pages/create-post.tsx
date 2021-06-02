@@ -16,7 +16,12 @@ const CreatePost = () => {
       <Formik
         initialValues={{ text: '', title: '' }}
         onSubmit={async (values) => {
-          const res = await createPost({ variables: { input: values } });
+          const res = await createPost({
+            variables: { input: values },
+            update: (cache) => {
+              cache.evict({ fieldName: 'posts:{}' });
+            },
+          });
           if (res.data?.createPost) {
             router.push('/');
           }

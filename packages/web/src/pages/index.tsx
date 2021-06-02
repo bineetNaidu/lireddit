@@ -85,7 +85,12 @@ const Index = () => {
                         colorScheme="red"
                         variant="ghost"
                         onClick={async () =>
-                          await deletePost({ variables: { id: p.id } })
+                          await deletePost({
+                            variables: { id: p.id },
+                            update: (cache) => {
+                              cache.evict({ id: 'Post:' + p.id });
+                            },
+                          })
                         }
                       >
                         <DeleteIcon />
